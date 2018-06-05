@@ -10,14 +10,15 @@ def find_rank(data, event, wcaid):
 		return np.zeros(0)
 	else:
 		# Return the WCAIDs of everyone faster
-		return event_ranks[:your_rank[0]+1]['ID']
+		return event_ranks[np.where(event_ranks['time'] \
+		<= event_ranks[your_rank[0]][2])]['ID']
 
 def find_result(data, event, wcaid):
 	# Extract rankings for particular event
 	event_ranks = data[np.where(data['eventid'] == event)]
 	# Find your ranking
 	your_rank = np.where(event_ranks['ID'] == wcaid)[0]
-	if not your_rank:
+	if not your_rank.size:
 		return -1
 	else:
 		# Return your result
