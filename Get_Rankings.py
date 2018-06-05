@@ -45,7 +45,16 @@ for i in range(len(nem)):
 			results[i, count] = find_result(average, j, wcaid)
 			count += 1
 
-np.savetxt('data.dat', np.hstack((nem[:, None], results)), fmt = '%s')
+headings = ['WCAID']
+
+for i in events:
+	headings.append(i + '_single')
+	if i != '444bf' and i != '555bf' and i != '333mbf':
+		headings.append(i + '_average')
+
+headings = np.array(headings)
+
+np.savetxt('data.dat', np.vstack((headings, np.hstack((nem[:, None], results)))), fmt = '%s')
 
 
 
