@@ -1,21 +1,23 @@
 import numpy as np
 import sys
 
-def find_rank(data, event, wcaid):
+def find_result(data, event, wcaid):
 	# Extract rankings for particular event
 	event_ranks = data[np.where(data['eventid'] == event)]
 	# Find your ranking
 	your_rank = np.where(event_ranks['ID'] == wcaid)[0]
 	if not your_rank:
-		return np.zeros(0)
+		return -1
 	else:
-		# Else return the WCAIDs of everyone faster
-		return event_ranks[:your_rank[0]+1]['ID']
+		# Return your result
+		return event_ranks[your_rank[0]]['time']
 
 if len(sys.argv) > 1:
 	ID = sys.argv[1]
 else:
 	ID = '2009METH01'
+
+nem = np.loadtxt(ID + '_Nemeses.dat', dtype = 'S10')
 
 # Import database
 single = np.genfromtxt('WCA_export_RanksSingle.tsv', \
@@ -31,25 +33,19 @@ events = ['333', '222', '444', '555', '666', '777', '333bf', \
 '333fm', '333oh', '333ft', 'clock', 'minx', 'pyram', 'skewb', \
 'sq1', '444bf', '555bf', '333mbf']
 
-nem = set(find_rank(single, '333', ID))
+results = np.zeros((len(nem), 33), dtype = int)
 
-# Find nemeses
-for i in events:
-	rank_single = find_rank(single, i, ID)
-	if rank_single.size:
-		nem = nem & set(rank_single)
-		if i != '444bf' and i != '555bf' and i != '333mbf':
-			rank_average = find_rank(average, i, ID)
-			if rank_average.size:
-				nem = nem & set(rank_average)
+for i in range(len(nem)):
+	wcaid = nem[i]
+	count = 0
+	for j in events:
+		results[i, count] = find_result(single, j, wcaid)
+		count += 1
+		if j != '444bf' and j != '555bf' and j != '333mbf':
+			results[i, count] = find_result(average, j, wcaid)
+			count += 1
 
-nem = np.array(list(nem))
-nem.sort()
-
-np.savetxt(ID + '_Nemeses.dat', nem, fmt = '%s')
-
-print ID + ' has ' + str(len(nem) - 1) + ' nemeses.\nThey have been written to the file ' + ID + '_Nemeses.dat.'
-
+np.savetxt('data.dat', np.hstack((nem[:, None], results)), fmt = '%s')
 
 
 
