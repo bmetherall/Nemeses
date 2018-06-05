@@ -9,7 +9,7 @@ def find_rank(data, event, wcaid):
 	if not your_rank:
 		return np.zeros(0)
 	else:
-		# Else return the WCAIDs of everyone faster
+		# Return the WCAIDs of everyone faster
 		return event_ranks[:your_rank[0]+1]['ID']
 
 def find_result(data, event, wcaid):
